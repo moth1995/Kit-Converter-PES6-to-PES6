@@ -33,11 +33,17 @@ def rotate_bound(image, angle):
 #abro la imagen y la muestro
 #archivo ='all.png' #para debuggear
 def convertir_kit(kit):
-    img = cv2.imread(kit, -1)
+    #print(kit)
+    stream = open(u'%s'% kit, "rb")
+    bytes = bytearray(stream.read())
+    numpyarray = np.asarray(bytes, dtype=np.uint8)
+    img = cv2.imdecode(numpyarray, cv2.IMREAD_UNCHANGED)
+    #img = cv2.imread(kit, -1)
     #cv2.imshow('image', img)
+    #print (img.shape)
     tamanio = img.shape
     if tamanio[0]==512 and tamanio[1]==512 and tamanio[2]==4:
-        print(kit)
+        #print(kit)
         chunk_size = 4096
         with open(kit,'rb') as img_rf:
             with open(kit+'_pes6','wb') as wf_img:
@@ -73,7 +79,9 @@ def convertir_kit(kit):
         img1[0 : 164 ,  678 : 736] = collar
         img1[0 : 104 ,  574 : 678] = u_short
         #cv2.imshow('image', img1)#descomentar esto si queres ver un preview de las imagenes convertidas
-        cv2.imwrite(kit, img1)
+        #cv2.imwrite(kit, img1)
+        is_success, im_buf_arr = cv2.imencode(".png", img1)
+        im_buf_arr.tofile(kit)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
     else:
@@ -91,5 +99,6 @@ exts = ["*.png","*/*.png","*/*/*.png","*/*/*/*.png","*/*/*/*/*.png"]
 archivos = getFilenames(exts)
 #print(archivos)
 for archivo in archivos:
+    #print("debugg "+ archivo)
     convertir_kit(archivo)
 print("todos sus kits fueron convertidos, revise el archivo log.txt para mas informacion :)")
